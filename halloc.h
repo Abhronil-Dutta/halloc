@@ -11,7 +11,7 @@ typedef struct {
     void* prev;   // pointer to the previous block
 } Header;  // 24 bytes
 
-
+// main functions
 void* halloc(size_t size);
 int hfree(void* addr);
 

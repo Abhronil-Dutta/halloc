@@ -1,3 +1,5 @@
+// I did not write these tests cuz I am too lazy.. but hey this says my code works
+
 #include "halloc.h"
 
 #include <stdint.h>

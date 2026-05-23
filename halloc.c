@@ -1,9 +1,11 @@
 #include "halloc.h"
 
-
+// saving the address of the start and end of the heap
 static Header* heap_start = NULL;
 static void* heap_end = NULL;
 
+
+// traverses through the heap linked list and finds the block that is free and has the required size
 Header* find_free_block(size_t size){
     Header* current = heap_start;
     while (current != NULL){
@@ -15,6 +17,7 @@ Header* find_free_block(size_t size){
     return NULL;
 }
 
+// if the heap doesnt have the needed block, ask system for more memory using sbrk
 Header* expand_heap(size_t size) {
     size_t needed = size + sizeof(Header);
     void* new_space = sbrk(needed);
@@ -39,6 +42,7 @@ Header* expand_heap(size_t size) {
     return new_block;
 }
 
+// manages the header for the block that has been deemed fit for allocation
 void allocate_block(Header* block, size_t size){
     block->free = 0;
 
@@ -60,6 +64,7 @@ void allocate_block(Header* block, size_t size){
     }
 }
 
+// main halloc function
 void* halloc(size_t size){
     // CASE 1: First call innitial loop
     if (heap_start == NULL){
@@ -88,7 +93,8 @@ void* halloc(size_t size){
 }
 
 
-
+// main hfree function 
+// also if the consecutive blocks are also free it merges them into one
 int hfree(void* addr){
     if (addr == NULL) return 0;
 

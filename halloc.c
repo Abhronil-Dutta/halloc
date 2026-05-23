@@ -47,7 +47,7 @@ void allocate_block(Header* block, size_t size){
         new_block->size = remaining - sizeof(Header);
         new_block->next = block->next;
         new_block->prev = (void*)block;
-        
+
         if (block->next != NULL) {
             ((Header*)block->next)->prev = (void*)new_block;
         }
@@ -86,13 +86,39 @@ void* halloc(size_t size){
 
 
 int hfree(void* addr){
-    Header* header = (Header*)((char*)addr - sizeof(Header));
-    header->free = 1;
-    return 0;
-}
-int main(){
-    void* ptr1 = halloc(100);
-    printf("User got pointer: %p\n", ptr1);
+    if (ptr == NULL) return 0;
 
+    Header* block = (Header*)ptr - 1;
+
+    if (block->free == 1){
+        return 0; // block is already free
+    }
+
+    block->free = 1;
+
+    if (block->next != NULL) {
+        Header* next = (Header*)block->next;
+        if (next->free == 1) {
+            block->size += sizeof(Header) + next->size;
+            block->next = next->next;
+            if (next->next != NULL) {
+                ((Header*)next->next)->prev = (void*)block;
+            }
+        }
+    }
+
+    if (block->prev != NULL) {
+        Header* prev = (Header*)block->prev;
+        if (prev->free == 1) {
+            prev->size += sizeof(Header) + block->size;
+            prev->next = block->next;
+            if (block->next != NULL) {
+                ((Header*)block->next)->prev = (void*)prev;
+            }
+        }
+    }
+
+    return 1;
 }
+
 
